@@ -22,6 +22,8 @@ public class MqttConfigProperties {
     private String password;
 
 
+    private String dataDir;
+
     /**
      * Mqtt Pool Config
      */
@@ -57,5 +59,13 @@ public class MqttConfigProperties {
 
     public void setPool(MqttPoolConfig pool) {
         this.pool = pool;
+    }
+
+    public String getDataDir() {
+        return dataDir;
+    }
+
+    public void setDataDir(String dataDir) {
+        this.dataDir = dataDir;
     }
 }

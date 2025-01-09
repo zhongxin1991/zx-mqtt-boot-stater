@@ -21,27 +21,23 @@ public class MqttAutoConfiguration {
 
     @Bean
     public MqttConnectionPool mqttConnectionPool() {
-        // 连接池配置
-        GenericObjectPoolConfig<MqttConnection> poolConfig = this.initPoolConfig();
-
         // mqtt连接配置
         MqttConnectOptions connOpts = new MqttConnectOptions();
-        connOpts.setUserName(this.mqttConfig.getUserName());
+        connOpts.setUserName(mqttConfig.getUserName());
         if (mqttConfig.getPassword() != null && !mqttConfig.getPassword().isEmpty()) {
-            connOpts.setPassword(this.mqttConfig.getPassword().toCharArray());
+            connOpts.setPassword(mqttConfig.getPassword().toCharArray());
         }
 
-        // 创建工厂对象
-        MqttConnectionFactory connectionFactory = new MqttConnectionFactory(mqttConfig.getUrl(), connOpts);
+        MqttConnectionFactory connectionFactory = new MqttConnectionFactory(mqttConfig.getUrl(), connOpts, mqttConfig.getDataDir());
 
-        // 创建连接池
+        // 连接池配置
+        GenericObjectPoolConfig<MqttConnection> poolConfig = initPoolConfig(mqttConfig.getPool());
+
         return new MqttConnectionPool(connectionFactory, poolConfig);
-
     }
 
-    private GenericObjectPoolConfig<MqttConnection> initPoolConfig() {
+    public static GenericObjectPoolConfig<MqttConnection> initPoolConfig(MqttPoolConfig mqttPoolConfig) {
         GenericObjectPoolConfig<MqttConnection> poolConfig = new GenericObjectPoolConfig<>();
-        MqttPoolConfig mqttPoolConfig = this.mqttConfig.getPool();
 
         poolConfig.setMinIdle(mqttPoolConfig.getMinIdle());
         poolConfig.setMaxIdle(mqttPoolConfig.getMaxIdle());

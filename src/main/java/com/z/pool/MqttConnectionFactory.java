@@ -1,11 +1,15 @@
 package com.z.pool;
 
 import com.z.utils.IdUtils;
+
 import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
+
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+
+import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,12 +23,18 @@ public class MqttConnectionFactory extends BasePooledObjectFactory<MqttConnectio
 
     private final String serverURI;
 
+    private final String dataDir;
+
     private final MqttConnectOptions mqttConnectOptions;
 
 
-    public MqttConnectionFactory(String serverURI, MqttConnectOptions mqttConnectOptions) {
+    public MqttConnectionFactory(String serverURI, MqttConnectOptions mqttConnectOptions,String dataDir) {
         this.serverURI = serverURI;
         this.mqttConnectOptions = mqttConnectOptions;
+        if(dataDir == null || dataDir.isEmpty()){
+            dataDir = "/tmp/mqtt_client";
+        }
+        this.dataDir = dataDir;
     }
 
     @Override
@@ -33,7 +43,7 @@ public class MqttConnectionFactory extends BasePooledObjectFactory<MqttConnectio
         String clientId = IdUtils.nextId() + "_" + count;
 
         // 创建MQTT连接对象
-        MqttClient mqttClient = new MqttClient(serverURI, clientId);
+        MqttClient mqttClient = new MqttClient(serverURI, clientId,new MqttDefaultFilePersistence(dataDir));
 
         // 建立连接
         mqttClient.connect(mqttConnectOptions);
@@ -59,9 +69,8 @@ public class MqttConnectionFactory extends BasePooledObjectFactory<MqttConnectio
     @Override
     public boolean validateObject(PooledObject<MqttConnection> p) {
         MqttConnection mqttConnection = p.getObject();
-        return mqttConnection.getMqttClient().isConnected();
+        return mqttConnection.isConnected();
     }
-
 
 
 }

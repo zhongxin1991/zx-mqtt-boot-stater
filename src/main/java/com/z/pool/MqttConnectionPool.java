@@ -23,6 +23,10 @@ public class MqttConnectionPool extends GenericObjectPool<MqttConnection> {
     @Override
     public void returnObject(MqttConnection conn) {
         if (conn != null) {
+            if (conn.getPool() != null) {
+                conn.setPool(null);
+            }
+
             super.returnObject(conn);
         }
     }

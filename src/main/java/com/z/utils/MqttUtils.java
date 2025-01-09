@@ -20,10 +20,11 @@ public class MqttUtils {
         MqttConnection connection = null;
         try {
             connection = mqttConnectionPool.borrowObject();
-            LOGGER.info("publish INFO ; clientId={},targetUrl={}", clientId, connection.getMqttClient().getServerURI());
             connection.publish(clientId, message);
         } catch (Exception e) {
-            LOGGER.error("publish ERROR ; clientId={},message={}", clientId, message, e);
+            if(LOGGER.isErrorEnabled()){
+                LOGGER.error("publish ERROR ; clientId={},message={}", clientId, message, e);
+            }
         } finally {
             if (null != connection) {
                 connection.close();
