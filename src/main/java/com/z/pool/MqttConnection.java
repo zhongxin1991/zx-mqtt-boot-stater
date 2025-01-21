@@ -18,7 +18,7 @@ public class MqttConnection {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    private MqttClient mqttClient;
+    private final MqttClient mqttClient;
 
     public MqttConnection(MqttClient mqttClient) {
         this.mqttClient = mqttClient;
